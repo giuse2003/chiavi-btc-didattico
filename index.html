@@ -206,7 +206,7 @@
       width: auto;
       border-collapse: collapse;
       table-layout: fixed;
-      min-width: 720px;
+      min-width: 900px;
     }
 
     th,
@@ -237,6 +237,11 @@
       width: 630px;
     }
 
+    th:nth-child(3),
+    td:nth-child(3) {
+      width: 180px;
+    }
+
     .num {
       font-family: Consolas, "Courier New", monospace;
       white-space: nowrap;
@@ -248,6 +253,13 @@
       font-size: 15px;
       white-space: nowrap;
       letter-spacing: 0;
+      user-select: text;
+    }
+
+    .balance {
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
       user-select: text;
     }
 
@@ -308,6 +320,7 @@
       <div id="message" class="message" role="status" aria-live="polite"></div>
 
       <p class="limit-note">Limite massimo: 20.000 chiavi per pagina, per evitare rallentamenti o blocchi del browser durante il calcolo e la visualizzazione della tabella.</p>
+      <p class="limit-note">Il saldo non è ricavabile dalla sola chiave privata: in modalità locale, senza consultare la blockchain, resta non verificabile.</p>
 
       <div class="scale-info">
         <span class="scale-label">Pagina</span>
@@ -327,11 +340,12 @@
             <tr>
               <th>Numero</th>
               <th>Chiave privata WIF compresso</th>
+              <th>Saldo</th>
             </tr>
           </thead>
           <tbody id="keyTableBody">
             <tr>
-              <td colspan="2" class="empty">Premi "Genera" per creare la tabella.</td>
+              <td colspan="3" class="empty">Premi "Genera" per creare la tabella.</td>
             </tr>
           </tbody>
         </table>
@@ -640,7 +654,7 @@
       keyTableBody.innerHTML = "";
       const row = document.createElement("tr");
       const cell = document.createElement("td");
-      cell.colSpan = 2;
+      cell.colSpan = 3;
       cell.className = "empty";
       cell.textContent = text;
       row.appendChild(cell);
@@ -654,15 +668,19 @@
         const row = document.createElement("tr");
         const numberCell = document.createElement("td");
         const wifCell = document.createElement("td");
+        const balanceCell = document.createElement("td");
 
         numberCell.className = "num";
         wifCell.className = "wif";
+        balanceCell.className = "balance";
 
         numberCell.textContent = item.number.toString();
         wifCell.textContent = item.wif;
+        balanceCell.textContent = "Non verificabile offline";
 
         row.appendChild(numberCell);
         row.appendChild(wifCell);
+        row.appendChild(balanceCell);
         keyTableBody.appendChild(row);
       }
     }
@@ -735,7 +753,7 @@
     }
 
     function makeCsv() {
-      const lines = ["chiave_privata_wif_compresso"];
+      const lines = [];
 
       for (const item of currentRows) {
         lines.push(item.wif);
